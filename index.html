@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>認定音楽療法士 資格更新 判定ツール</title>
+<style>
+  :root {
+    --ink: #1c2b3a;
+    --paper: #f6f1e4;
+    --paper-deep: #efe7d3;
+    --seal: #a8322d;
+    --seal-deep: #7f2420;
+    --gold: #9c7a2e;
+    --line: #d8cdae;
+    --old: #3d4f42;
+    --card: #fffdf8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    font-family: 'Hiragino Mincho ProN','Hiragino Sans','Yu Gothic',system-ui,sans-serif;
+    color: var(--ink);
+  }
+  .wrap { max-width: 480px; margin: 0 auto; padding-bottom: 48px; }
+  .header { background: var(--ink); padding: 28px 20px 20px; }
+  .header .eyebrow { font-size: 11px; letter-spacing: .25em; color: #a9b6c4; margin: 0; }
+  .header h1 { font-size: 20px; font-weight: 700; margin: 6px 0 0; color: var(--paper); line-height: 1.4; }
+  .header p.desc { font-size: 11.5px; margin: 10px 0 0; color: #8b98a6; line-height: 1.6; }
+
+  .stamp-wrap { padding: 0 20px; margin-top: -16px; position: relative; z-index: 1; }
+  .stamp-card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 6px 20px rgba(28,43,58,.12); }
+  .stamp-badge { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 3px solid #c9c0a5; color: #9a927a; font-size: 26px; transform: rotate(-6deg); }
+  .stamp-badge.ok { border-color: var(--seal); color: var(--seal); }
+  .stamp-title { font-size: 16.5px; font-weight: 700; margin: 0; }
+  .stamp-sub { font-size: 12px; margin: 4px 0 0; color: #7a7360; }
+
+  .conditions { margin-top: 12px; }
+  .cond-row { display: flex; align-items: center; gap: 10px; padding: 3px 4px; }
+  .cond-dot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; display:flex; align-items:center; justify-content:center; font-size: 9px; font-weight:700; color:#fff; border: 1.5px solid #b7ae92; }
+  .cond-dot.ok { background: #3f6b4f; border: none; }
+  .cond-text { font-size: 12.5px; color: #7a7360; }
+  .cond-text.ok { color: #3f6b4f; }
+
+  .migration-box { margin: 20px 20px 0; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+  .migration-box label { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; font-size: 13px; line-height: 1.5; }
+  .migration-box input[type=checkbox] { margin-top: 2px; width: 16px; height: 16px; flex-shrink: 0; }
+  .migration-box .hint { font-size: 11px; margin: 8px 0 0 28px; color: #948c74; line-height: 1.6; }
+  .old-tag { color: var(--old); font-weight: 600; }
+
+  .group-block { padding: 0 20px; margin-top: 24px; }
+  .group-heading { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 10px; padding: 0 4px; }
+  .group-heading .label { font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 5px; background: var(--ink); color: var(--paper); }
+  .group-heading .desc { font-size: 11.5px; margin-left: 8px; color: #7a7360; }
+  .group-heading .total { font-size: 15px; font-weight: 700; color: var(--seal); }
+  .group-heading .total.old { color: var(--old); }
+
+  .old-divider { background: var(--old); border-radius: 10px; padding: 8px 12px; margin: 0 20px 12px; }
+  .old-divider p { font-size: 12px; font-weight: 700; letter-spacing: .02em; color: var(--paper); margin: 0; }
+
+  .section { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; margin-bottom: 12px; }
+  .section-header { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: none; border: none; text-align: left; cursor: pointer; font: inherit; color: inherit; }
+  .section-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--paper-deep); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+  .section-title { flex: 1; min-width: 0; }
+  .section-title .t { font-size: 14.5px; font-weight: 600; margin: 0; }
+  .section-title .s { font-size: 11.5px; margin: 2px 0 0; color: #7a7360; }
+  .section-pts { font-size: 12.5px; font-weight: 700; flex-shrink: 0; color: #a49c86; }
+  .section-pts.has { color: var(--seal); }
+  .section-pts.has.old { color: var(--old); }
+  .chevron { flex-shrink: 0; color: #a49c86; transition: transform .15s; font-size: 13px; }
+  .chevron.open { transform: rotate(180deg); }
+  .section-body { padding: 0 16px 8px; border-top: 1px solid var(--line); }
+
+  .stepper-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; gap: 12px; border-top: 1px solid var(--line); }
+  .stepper-row:first-child { border-top: none; }
+  .stepper-label { font-size: 13.5px; line-height: 1.4; }
+  .stepper-pts { font-size: 11.5px; margin: 2px 0 0; color: var(--gold); }
+  .stepper-ctrl { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .stepper-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); background: var(--paper-deep); color: var(--ink); font-size: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .stepper-btn.plus { background: var(--ink); color: var(--paper); border: none; }
+  .stepper-btn.plus.old { background: var(--old); }
+  .stepper-val { width: 28px; text-align: center; font-size: 15px; font-weight: 600; }
+
+  .num-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; }
+  .num-input { width: 72px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper-deep); font-size: 14px; color: var(--ink); }
+
+  .docs-toggle { padding: 0 20px; margin-top: 16px; }
+  .docs-toggle button { background: none; border: none; color: var(--gold); font-size: 12.5px; display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 0; font: inherit; }
+  .docs-panel { margin-top: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; font-size: 11.5px; line-height: 1.7; color: #5c5644; }
+  .docs-panel .h { font-weight: 600; color: var(--ink); }
+
+  .footer { padding: 24px 20px 0; }
+  .reset-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 12px; background: var(--paper-deep); border: 1px solid var(--line); color: var(--ink); font-size: 13px; cursor: pointer; font: inherit; }
+  .disclaimer { font-size: 10.5px; margin-top: 16px; line-height: 1.7; text-align: center; color: #a49c86; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+"use strict";
+
+var STORAGE_KEY = "jmta-renewal-v3";
+
+function loadState() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return null;
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+function freshState() {
+  return {
+    item1: { national: 0, branch: 0 },
+    item2: { general: 0, designated: 0 },
+    item3: { national: 0, branch: 0 },
+    item4: 0, item5: 0, item6: 0,
+    item7: 0, item8: 0, item9: 0,
+    item10: { original: 0, short: 0, review: 0, coauthor: 0 },
+    item11: { original: 0, short: 0, review: 0, coauthor: 0 },
+    item12: 0,
+    migrationActive: false,
+    old: {
+      congressMain: 0, congressBranch: 0,
+      lectureMain: { long: 0, short: 0 },
+      lectureOrg: { long: 0, short: 0 },
+      overseas: 0, relatedCongress: 0, univCredits: 0,
+      presMain: { general: 0, organizer: 0, instructor: 0 },
+      presOrg: { general: 0, organizer: 0, instructor: 0 },
+      presRelated: 0,
+      journalMain: { original: 0, short: 0, feature: 0, material: 0, review: 0 },
+      journalOrg: { doctor: 0, original: 0, short: 0, material: 0 },
+      book: { originalEquiv: 0, other: 0, series: 0, coauthorOver10: 0, coauthorUnder10: 0, translateOver10: 0, translateUnder10: 0 },
+      clinicalMain: 0, clinicalSub: 0, supervision: 0, educationYears: 0
+    }
+  };
+}
+
+var state = loadState() || freshState();
+var openSections = { "n1": true };
+var showDocs = false;
+
+function getPath(obj, path) {
+  var parts = path.split(".");
+  var cur = obj;
+  for (var i = 0; i < parts.length; i++) { cur = cur[parts[i]]; if (cur == null) return 0; }
+  return cur;
+}
+function setPath(obj, path, value) {
+  var parts = path.split(".");
+  var cur = obj;
+  for (var i = 0; i < parts.length - 1; i++) cur = cur[parts[i]];
+  cur[parts[parts.length - 1]] = value;
+}
+function n(v) { return Number.isFinite(v) ? v : 0; }
+function cap(v, m) { return Math.min(v, m); }
+function esc(s) { return String(s); }
+
+function tierPts(t) { return t.mult ? t.mult(n(getPath(state, t.path))) : n(getPath(state, t.path)) * t.pts; }
+function sectionPts(sec) {
+  var total = 0;
+  for (var i = 0; i < sec.tiers.length; i++) total += tierPts(sec.tiers[i]);
+  if (sec.cap != null) total = cap(total, sec.cap);
+  return total;
+}
+
+var NEW_SECTIONS = [
+  { id: "n1", icon: "👥", title: "1. 学術大会への参加", sub: "全国大会 6P／支部大会 3P", tiers: [
+      { path: "item1.national", label: "全国大会（参加回数）", pts: 6, ptsLabel: "6P/件" },
+      { path: "item1.branch", label: "支部大会（参加回数）", pts: 3, ptsLabel: "3P/件" }
+  ]},
+  { id: "n2", icon: "🎓", title: "2. 講習会・事例検討会の受講", sub: "90〜180分未満 各2P（資格更新指定講座を2件以上含む必要あり）", tiers: [
+      { path: "item2.general", label: "一般の講習会・事例検討会", pts: 2, ptsLabel: "2P/件" },
+      { path: "item2.designated", label: "資格更新指定講座（必須・2件以上）", pts: 2, ptsLabel: "2P/件" }
+  ]},
+  { id: "n3", icon: "👥", title: "3. 学術大会の実行委員", sub: "全国大会 6P／支部大会 3P（同一大会の参加ポイントとは併用不可）", tiers: [
+      { path: "item3.national", label: "全国大会（実行委員）", pts: 6, ptsLabel: "6P/件" },
+      { path: "item3.branch", label: "支部大会（実行委員）", pts: 3, ptsLabel: "3P/件" }
+  ]},
+  { id: "n4", icon: "🌐", title: "4. 世界音楽療法連盟 学術大会参加", tiers: [ { path: "item4", label: "参加回数", pts: 5, ptsLabel: "5P/件" } ] },
+  { id: "n5", icon: "🌐", title: "5. 世界音楽療法連盟 講習会受講", tiers: [ { path: "item5", label: "受講回数", pts: 5, ptsLabel: "5P/件" } ] },
+  { id: "n6", icon: "📘", title: "6. 登録団体主催・支部認定の講習会受講", sub: "90〜180分未満", tiers: [ { path: "item6", label: "受講回数", pts: 1, ptsLabel: "1P/件" } ] }
+];
+
+var NEW_SECTIONS_2 = [
+  { id: "n7", icon: "🎤", title: "7. 学術大会での研究発表（筆頭演者）", sub: "ポスター含む", tiers: [ { path: "item7", label: "発表回数", pts: 8, ptsLabel: "8P/件" } ] },
+  { id: "n8", icon: "🎓", title: "8. 講習会の講師", tiers: [ { path: "item8", label: "担当回数", pts: 8, ptsLabel: "8P/件" } ] },
+  { id: "n9", icon: "👥", title: "9. シンポジウム等（企画者・シンポジスト・話題提供者・指定討論者等）", tiers: [ { path: "item9", label: "回数", pts: 8, ptsLabel: "8P/件" } ] },
+  { id: "n10", icon: "📄", title: "10. 学会誌への投稿", sub: "本学会／世界音楽療法連盟", tiers: [
+      { path: "item10.original", label: "原著・総説", pts: 10, ptsLabel: "10P/件" },
+      { path: "item10.short", label: "小論文・特集記事", pts: 6, ptsLabel: "6P/件" },
+      { path: "item10.review", label: "資料・書評", pts: 3, ptsLabel: "3P/件" },
+      { path: "item10.coauthor", label: "共同執筆者（一律）", pts: 1, ptsLabel: "1P/件" }
+  ]},
+  { id: "n11", icon: "📄", title: "11. 研究誌への投稿", sub: "支部・本学会登録団体", tiers: [
+      { path: "item11.original", label: "原著・総説", pts: 5, ptsLabel: "5P/件" },
+      { path: "item11.short", label: "小論文・特集記事", pts: 3, ptsLabel: "3P/件" },
+      { path: "item11.review", label: "資料・書評", pts: 2, ptsLabel: "2P/件" },
+      { path: "item11.coauthor", label: "共同執筆者（一律）", pts: 1, ptsLabel: "1P/件" }
+  ]},
+  { id: "n12", icon: "🎓", title: "12. 登録団体主催・支部認定講習会の講師", tiers: [ { path: "item12", label: "担当回数", pts: 5, ptsLabel: "5P/件" } ] }
+];
+
+var OLD_SECTIONS_1 = [
+  { id: "o1", icon: "👥", title: "⑴⑵ 学術大会への参加", sub: "本学会大会・支部大会 各5P", tiers: [
+      { path: "old.congressMain", label: "本学会学術大会（参加回数）", pts: 5, ptsLabel: "5P/件" },
+      { path: "old.congressBranch", label: "支部大会（参加回数）", pts: 5, ptsLabel: "5P/件" }
+  ]},
+  { id: "o2", icon: "🎓", title: "⑶ 学会・支部主催の講習会受講", sub: "180分以上5P／90〜180分未満2.5P", tiers: [
+      { path: "old.lectureMain.long", label: "180分以上", pts: 5, ptsLabel: "5P/件" },
+      { path: "old.lectureMain.short", label: "90〜180分未満", pts: 2.5, ptsLabel: "2.5P/件" }
+  ]},
+  { id: "o3", icon: "🎓", title: "⑷ 認定団体主催の講習会受講", sub: "180分以上3P／90〜180分未満1.5P", tiers: [
+      { path: "old.lectureOrg.long", label: "180分以上", pts: 3, ptsLabel: "3P/件" },
+      { path: "old.lectureOrg.short", label: "90〜180分未満", pts: 1.5, ptsLabel: "1.5P/件" }
+  ]},
+  { id: "o4", icon: "🌐", title: "⑸ 海外の大会・講習会参加", tiers: [ { path: "old.overseas", label: "参加回数", pts: 5, ptsLabel: "5P/件" } ] },
+  { id: "o5", icon: "👥", title: "⑹ 関連学会主催の学術大会・講習会", tiers: [ { path: "old.relatedCongress", label: "参加回数", pts: 3, ptsLabel: "3P/件" } ] },
+  { id: "o6", icon: "🎓", title: "⑺ 国内外の大学・大学院での研修", sub: "2単位＝5P（上限20P）", cap: 20, tiers: [
+      { path: "old.univCredits", label: "取得単位数", ptsLabel: "2単位ごとに5P・上限20P", mult: function (v) { return cap(Math.floor(v / 2) * 5, 20); } }
+  ]}
+];
+
+var OLD_SECTIONS_2 = [
+  { id: "o7", icon: "🎤", title: "⑻ 本学会・支部・海外学会での発表", tiers: [
+      { path: "old.presMain.general", label: "一般発表（ポスター含む）", pts: 8, ptsLabel: "8P/件" },
+      { path: "old.presMain.organizer", label: "企画者・シンポジスト・指定討論者・話題提供者", pts: 8, ptsLabel: "8P/件" },
+      { path: "old.presMain.instructor", label: "講習会・研修会等の講師", pts: 10, ptsLabel: "10P/件" }
+  ]},
+  { id: "o8", icon: "🎤", title: "⑼ 認定団体主催の講習会等での発表", tiers: [
+      { path: "old.presOrg.general", label: "一般発表（ポスター含む）", pts: 5, ptsLabel: "5P/件" },
+      { path: "old.presOrg.organizer", label: "企画者・シンポジスト・指定討論者・話題提供者", pts: 8, ptsLabel: "8P/件" },
+      { path: "old.presOrg.instructor", label: "講師参加", pts: 8, ptsLabel: "8P/件" }
+  ]},
+  { id: "o9", icon: "🎤", title: "⑽ 関連学会主催大会での音楽療法に関する発表", tiers: [ { path: "old.presRelated", label: "発表回数", pts: 5, ptsLabel: "5P/件" } ] }
+];
+
+var OLD_SECTIONS_3 = [
+  { id: "o10", icon: "📄", title: "⑾ 本学会誌・支部学会誌・関連学会誌等への論文", tiers: [
+      { path: "old.journalMain.original", label: "原著・総説", pts: 10, ptsLabel: "10P/件" },
+      { path: "old.journalMain.short", label: "小論文（事例研究含む）", pts: 6, ptsLabel: "6P/件" },
+      { path: "old.journalMain.feature", label: "特集記事（学会誌のみ）", pts: 6, ptsLabel: "6P/件" },
+      { path: "old.journalMain.material", label: "資料", pts: 3, ptsLabel: "3P/件" },
+      { path: "old.journalMain.review", label: "書評（学会誌のみ）", pts: 3, ptsLabel: "3P/件" }
+  ]},
+  { id: "o11", icon: "📄", title: "⑿ 登録研究団体誌・大学紀要・学位論文等", tiers: [
+      { path: "old.journalOrg.doctor", label: "博士論文", pts: 10, ptsLabel: "10P/件" },
+      { path: "old.journalOrg.original", label: "原著・総説・研究紀要・修士論文", pts: 5, ptsLabel: "5P/件" },
+      { path: "old.journalOrg.short", label: "小論文（事例研究含む）", pts: 3, ptsLabel: "3P/件" },
+      { path: "old.journalOrg.material", label: "資料", pts: 1, ptsLabel: "1P/件" }
+  ]},
+  { id: "o12", icon: "🗄", title: "⒀ 音楽療法関係の著書出版", sub: "共著の場合は筆頭者以外、按分後の値を件数として入力", tiers: [
+      { path: "old.book.originalEquiv", label: "原著に準ずるもの", pts: 15, ptsLabel: "15P/件" },
+      { path: "old.book.other", label: "その他の出版", pts: 10, ptsLabel: "10P/件" },
+      { path: "old.book.series", label: "講座等（各巻を1冊として）", pts: 10, ptsLabel: "10P/件" },
+      { path: "old.book.coauthorOver10", label: "分担執筆・10ページ以上", pts: 7, ptsLabel: "7P/件" },
+      { path: "old.book.coauthorUnder10", label: "分担執筆・10ページ未満", pts: 3, ptsLabel: "3P/件" },
+      { path: "old.book.translateOver10", label: "翻訳・10ページ以上", pts: 7, ptsLabel: "7P/件" },
+      { path: "old.book.translateUnder10", label: "翻訳・10ページ未満", pts: 3, ptsLabel: "3P/件" }
+  ]}
+];
+
+var OLD_SECTIONS_4 = [
+  { id: "o13", icon: "🩺", title: "⒁ 有償の臨床経験", sub: "主セラピスト5P／副セラピスト2P・症例（上限30P）", cap: 30, tiers: [
+      { path: "old.clinicalMain", label: "主セラピスト（症例数）", pts: 5, ptsLabel: "5P/件" },
+      { path: "old.clinicalSub", label: "副セラピスト（症例数）", pts: 2, ptsLabel: "2P/件" }
+  ]},
+  { id: "o14", icon: "👥", title: "⒂ スーパーバイジー／バイザー経験", sub: "上限16P", cap: 16, tiers: [
+      { path: "old.supervision", label: "経験回数", pts: 8, ptsLabel: "8P/件・上限16P" }
+  ]},
+  { id: "o15", icon: "🎓", title: "⒃ 教育機関での音楽療法教育経験", sub: "上限24P", cap: 24, tiers: [
+      { path: "old.educationYears", label: "担当年数", pts: 8, ptsLabel: "8P/年・上限24P" }
+  ]}
+];
+
+function groupTotal(list) { var t = 0; for (var i = 0; i < list.length; i++) t += sectionPts(list[i]); return t; }
+
+function renderStepper(t) {
+  var val = n(getPath(state, t.path));
+  var oldMode = t.path.indexOf("old.") === 0;
+  return (
+    '<div class="stepper-row">' +
+      '<div><p class="stepper-label">' + esc(t.label) + '</p>' +
+      (t.ptsLabel ? '<p class="stepper-pts">' + esc(t.ptsLabel) + '</p>' : '') + '</div>' +
+      '<div class="stepper-ctrl">' +
+        '<button class="stepper-btn" data-step="' + t.path + '" data-delta="-1" aria-label="減らす">－</button>' +
+        '<span class="stepper-val">' + val + '</span>' +
+        '<button class="stepper-btn plus' + (oldMode ? ' old' : '') + '" data-step="' + t.path + '" data-delta="1" aria-label="増やす">＋</button>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+function renderSection(sec, oldMode) {
+  var open = !!openSections[sec.id];
+  var pts = sectionPts(sec);
+  var ptsClass = pts > 0 ? (oldMode ? "section-pts has old" : "section-pts has") : "section-pts";
+  var body = "";
+  for (var i = 0; i < sec.tiers.length; i++) body += renderStepper(sec.tiers[i]);
+  return (
+    '<div class="section">' +
+      '<button class="section-header" data-toggle="' + sec.id + '">' +
+        '<div class="section-icon">' + sec.icon + '</div>' +
+        '<div class="section-title"><p class="t">' + esc(sec.title) + '</p>' +
+        (sec.sub ? '<p class="s">' + esc(sec.sub) + '</p>' : '') + '</div>' +
+        '<span class="' + ptsClass + '">' + pts + 'P</span>' +
+        '<span class="chevron' + (open ? " open" : "") + '">▾</span>' +
+      '</button>' +
+      (open ? '<div class="section-body">' + body + '</div>' : '') +
+    '</div>'
+  );
+}
+
+function renderGroupHeading(label, desc, total, oldMode) {
+  return (
+    '<div class="group-heading">' +
+      '<div><span class="label">' + esc(label) + '</span><span class="desc">' + esc(desc) + '</span></div>' +
+      '<span class="total' + (oldMode ? " old" : "") + '">' + total + 'P</span>' +
+    '</div>'
+  );
+}
+
+function computeAll() {
+  var groupI = groupTotal(NEW_SECTIONS);
+  var groupII = groupTotal(NEW_SECTIONS_2);
+  var newTotal = groupI + groupII;
+
+  var oG1 = groupTotal(OLD_SECTIONS_1);
+  var oG2 = groupTotal(OLD_SECTIONS_2);
+  var oG3 = groupTotal(OLD_SECTIONS_3);
+  var oG4 = groupTotal(OLD_SECTIONS_4);
+  var oldTotal = oG1 + oG2 + oG3 + oG4;
+
+  var usesMigration = state.migrationActive && newTotal < 30;
+  var grandTotal = usesMigration ? newTotal + oldTotal : newTotal;
+
+  var hasCongress = n(state.item1.national) + n(state.item1.branch) + n(state.item4) > 0;
+  var hasDesignated = n(state.item2.designated) >= 2;
+  var meetsPoints = grandTotal >= 30;
+  var eligible = meetsPoints && hasCongress && hasDesignated;
+
+  return { groupI: groupI, groupII: groupII, newTotal: newTotal, oG1: oG1, oG2: oG2, oG3: oG3, oG4: oG4, oldTotal: oldTotal, usesMigration: usesMigration, grandTotal: grandTotal, hasCongress: hasCongress, hasDesignated: hasDesignated, meetsPoints: meetsPoints, eligible: eligible };
+}
+
+function render() {
+  var c = computeAll();
+
+  var html = '<div class="wrap">';
+
+  html += '<div class="header"><p class="eyebrow">JMTA CERTIFICATION</p>' +
+    '<h1>認定音楽療法士<br>資格更新 判定ツール</h1>' +
+    '<p class="desc">2025年4月改定の新規則と、移行期間中に合算できる旧規則（〜2025年3月）の両方に対応しています。</p></div>';
+
+  html += '<div class="stamp-wrap"><div class="stamp-card">' +
+    '<div class="stamp-badge' + (c.eligible ? ' ok' : '') + '">' + (c.eligible ? '✓' : '⚠') + '</div>' +
+    '<div><p class="stamp-title" style="color:' + (c.eligible ? 'var(--seal-deep)' : 'var(--ink)') + '">' + (c.eligible ? '更新可能の見込み' : '条件未達（猶予申請の検討へ）') + '</p>' +
+    '<p class="stamp-sub">合計 ' + c.grandTotal + 'P（新規則 ' + c.newTotal + 'P' + (c.usesMigration ? ' + 旧規則 ' + c.oldTotal + 'P' : '') + '） / 必要 30P</p></div>' +
+    '</div>' +
+    '<div class="conditions">' +
+      '<div class="cond-row"><div class="cond-dot' + (c.meetsPoints ? ' ok' : '') + '">' + (c.meetsPoints ? '✓' : '') + '</div><span class="cond-text' + (c.meetsPoints ? ' ok' : '') + '">合計30ポイント以上（Ⅰ群のみ、またはⅠ群＋Ⅱ群。移行期間は旧規則ポイントを合算可）</span></div>' +
+      '<div class="cond-row"><div class="cond-dot' + (c.hasCongress ? ' ok' : '') + '">' + (c.hasCongress ? '✓' : '') + '</div><span class="cond-text' + (c.hasCongress ? ' ok' : '') + '">学術大会（本学会・支部・世界大会）に参加している</span></div>' +
+      '<div class="cond-row"><div class="cond-dot' + (c.hasDesignated ? ' ok' : '') + '">' + (c.hasDesignated ? '✓' : '') + '</div><span class="cond-text' + (c.hasDesignated ? ' ok' : '') + '">資格更新指定講座を2講座以上受講している</span></div>' +
+    '</div></div>';
+
+  html += '<div class="migration-box"><label>' +
+    '<input type="checkbox" id="migrationCheckbox"' + (state.migrationActive ? ' checked' : '') + '>' +
+    '<span>2025〜2029年度の更新で、<span class="old-tag">旧規則（2025年3月31日まで）</span>のポイントを項目ごとに入力して合算したい</span>' +
+    '</label><p class="hint">新規則のみで30P以上ある場合、旧規則ポイントは自動的に合算されません。</p></div>';
+
+  html += '<div class="group-block">' + renderGroupHeading("Ⅰ群（新）", "学術大会参加・運営／講習会受講", c.groupI, false);
+  for (var i = 0; i < NEW_SECTIONS.length; i++) html += renderSection(NEW_SECTIONS[i], false);
+  html += '</div>';
+
+  html += '<div class="group-block">' + renderGroupHeading("Ⅱ群（新）", "研究発表・講師・論文投稿等", c.groupII, false);
+  for (var j = 0; j < NEW_SECTIONS_2.length; j++) html += renderSection(NEW_SECTIONS_2[j], false);
+  html += '</div>';
+
+  if (state.migrationActive) {
+    html += '<div class="group-block" style="margin-top:32px;">';
+    html += '<div class="old-divider"><p>旧規則（〜2025年3月31日取得分）</p></div>';
+    html += renderGroupHeading("Ⅰ群（旧）", "学術大会・研修会・講習会受講", c.oG1, true);
+    for (var k = 0; k < OLD_SECTIONS_1.length; k++) html += renderSection(OLD_SECTIONS_1[k], true);
+
+    html += renderGroupHeading("Ⅱ群（旧）", "研究発表", c.oG2, true);
+    for (var m = 0; m < OLD_SECTIONS_2.length; m++) html += renderSection(OLD_SECTIONS_2[m], true);
+
+    html += renderGroupHeading("Ⅲ群（旧）", "研究論文・著書", c.oG3, true);
+    for (var p = 0; p < OLD_SECTIONS_3.length; p++) html += renderSection(OLD_SECTIONS_3[p], true);
+
+    html += renderGroupHeading("Ⅳ群（旧）", "臨床および教育実践", c.oG4, true);
+    for (var q = 0; q < OLD_SECTIONS_4.length; q++) html += renderSection(OLD_SECTIONS_4[q], true);
+    html += '</div>';
+  }
+
+  html += '<div class="docs-toggle"><button id="docsToggleBtn">ℹ ' + (showDocs ? '必要書類の一覧を閉じる' : '各項目の必要書類を見る') + '</button>';
+  if (showDocs) {
+    html += '<div class="docs-panel">' +
+      '<p class="h">新規則</p>' +
+      '<p>1・4：参加証明書　2・5・6：受講証　3：実行委員会組織図または実行委員証明書</p>' +
+      '<p>7〜9：プログラム等のコピー／発表証明書　10・11：目次と筆者がわかる箇所のコピー（11は投稿規定・倫理要綱も）　12：プログラム等のコピー</p>' +
+      '<p class="h" style="margin-top:8px;">旧規則</p>' +
+      '<p>⑴⑵⑶⑷：参加証・受講証（無記名は要記名）　⑺：単位取得証明書　⑻⑼⑽：発表証明・抄録コピー・プログラム　⑾⑿：投稿規定と抜き刷り（または本文・表紙・目次コピー）　⒀：著者名・目次・出版社・出版日がわかる部分のコピー　⒁：症例報告書（SKF/SKG）　⒂：スーパービジョン終了報告書（SKH）　⒃：教育終了報告書（SKI）</p>' +
+      '</div>';
+  }
+  html += '</div>';
+
+  html += '<div class="footer"><button class="reset-btn" id="resetBtn">↺ 入力をリセット</button>' +
+    '<p class="disclaimer">本ツールは日本音楽療法学会の公式サイト掲載情報をもとに作成した非公式の目安計算です。正式な判定・申請は学会発行の規則書および会員ポータルサイトでご確認ください。入力内容はこの端末のブラウザ内にのみ保存されます（他の人とは共有されません）。</p></div>';
+
+  html += '</div>';
+
+  document.getElementById("app").innerHTML = html;
+
+  if (state.migrationActive) {
+    var univSec = document.querySelector('[data-toggle="o6"]');
+    if (univSec && openSections["o6"]) {
+      var body = univSec.parentElement.querySelector(".section-body");
+      if (body) {
+        body.innerHTML = '<div class="num-row"><span class="stepper-label" style="flex:1;">取得単位数</span>' +
+          '<input class="num-input" type="number" min="0" id="univCreditsInput" value="' + n(state.old.univCredits) + '">' +
+          '<span class="stepper-pts" style="margin-left:-4px;">単位（2単位ごとに5P・上限20P）</span></div>';
+        document.getElementById("univCreditsInput").addEventListener("input", function (e) {
+          var v = parseInt(e.target.value, 10);
+          state.old.univCredits = isNaN(v) ? 0 : Math.max(0, v);
+          saveState();
+          render();
+        });
+      }
+    }
+  }
+}
+
+document.addEventListener("click", function (e) {
+  var stepBtn = e.target.closest("[data-step]");
+  if (stepBtn) {
+    var path = stepBtn.getAttribute("data-step");
+    var delta = parseInt(stepBtn.getAttribute("data-delta"), 10);
+    var cur = n(getPath(state, path));
+    var next = Math.max(0, cur + delta);
+    setPath(state, path, next);
+    saveState();
+    render();
+    return;
+  }
+  var toggleBtn = e.target.closest("[data-toggle]");
+  if (toggleBtn) {
+    var id = toggleBtn.getAttribute("data-toggle");
+    openSections[id] = !openSections[id];
+    render();
+    return;
+  }
+  if (e.target.id === "docsToggleBtn") {
+    showDocs = !showDocs;
+    render();
+    return;
+  }
+  if (e.target.id === "resetBtn") {
+    state = freshState();
+    saveState();
+    render();
+    return;
+  }
+});
+
+document.addEventListener("change", function (e) {
+  if (e.target.id === "migrationCheckbox") {
+    state.migrationActive = e.target.checked;
+    saveState();
+    render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
