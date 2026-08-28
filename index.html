@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>認定音楽療法士 資格更新 判定ツール</title>
+<title>認定音楽療法士 資格更新 確認ツール</title>
 <style>
   :root {
     --ink: #1c2b3a;
@@ -174,7 +174,7 @@ var NEW_SECTIONS = [
       { path: "item1.national", label: "全国大会（参加回数）", pts: 6, ptsLabel: "6P/件" },
       { path: "item1.branch", label: "支部大会（参加回数）", pts: 3, ptsLabel: "3P/件" }
   ]},
-  { id: "n2", icon: "🎓", title: "2. 講習会・事例検討会の受講", sub: "90〜180分未満 各2P（資格更新指定講座を2件以上含む必要あり）", tiers: [
+  { id: "n2", icon: "🎓", title: "2. 講習会（資格更新指定講座含む）の受講", sub: "90〜180分未満 各2P（資格更新指定講座を2件以上含む必要あり）", tiers: [
       { path: "item2.general", label: "一般の講習会・事例検討会", pts: 2, ptsLabel: "2P/件" },
       { path: "item2.designated", label: "資格更新指定講座（必須・2件以上）", pts: 2, ptsLabel: "2P/件" }
   ]},
@@ -184,7 +184,7 @@ var NEW_SECTIONS = [
   ]},
   { id: "n4", icon: "🌐", title: "4. 世界音楽療法連盟 学術大会参加", tiers: [ { path: "item4", label: "参加回数", pts: 5, ptsLabel: "5P/件" } ] },
   { id: "n5", icon: "🌐", title: "5. 世界音楽療法連盟 講習会受講", tiers: [ { path: "item5", label: "受講回数", pts: 5, ptsLabel: "5P/件" } ] },
-  { id: "n6", icon: "📘", title: "6. 登録団体主催・支部認定の講習会受講", sub: "90〜180分未満", tiers: [ { path: "item6", label: "受講回数", pts: 1, ptsLabel: "1P/件" } ] }
+  { id: "n6", icon: "📘", title: "6. 登録団体主催の認定講習会受講", sub: "90〜180分未満", tiers: [ { path: "item6", label: "受講回数", pts: 1, ptsLabel: "1P/件" } ] }
 ];
 
 var NEW_SECTIONS_2 = [
@@ -211,7 +211,7 @@ var OLD_SECTIONS_1 = [
       { path: "old.congressMain", label: "本学会学術大会（参加回数）", pts: 5, ptsLabel: "5P/件" },
       { path: "old.congressBranch", label: "支部大会（参加回数）", pts: 5, ptsLabel: "5P/件" }
   ]},
-  { id: "o2", icon: "🎓", title: "⑶ 学会・支部主催の講習会受講", sub: "180分以上5P／90〜180分未満2.5P", tiers: [
+  { id: "o2", icon: "🎓", title: "⑶ 学会・支部主催の講習会受講 ※上限５Pに注意！ 受講証を要確認", sub: "180分以上5P／90〜180分未満2.5P", tiers: [
       { path: "old.lectureMain.long", label: "180分以上", pts: 5, ptsLabel: "5P/件" },
       { path: "old.lectureMain.short", label: "90〜180分未満", pts: 2.5, ptsLabel: "2.5P/件" }
   ]},
@@ -353,7 +353,7 @@ function render() {
   var html = '<div class="wrap">';
 
   html += '<div class="header"><p class="eyebrow">JMTA CERTIFICATION</p>' +
-    '<h1>認定音楽療法士<br>資格更新 判定ツール</h1>' +
+    '<h1>認定音楽療法士<br>資格更新 確認ツール<br>※更新の可否を確定するものではありません</h1>' +
     '<p class="desc">2025年4月改定の新規則と、移行期間中に合算できる旧規則（〜2025年3月）の両方に対応しています。</p></div>';
 
   html += '<div class="stamp-wrap"><div class="stamp-card">' +
